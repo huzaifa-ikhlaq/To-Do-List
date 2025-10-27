@@ -1,64 +1,79 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
 
 export default function App() {
+  const [tasks, setTasks] = useState([]);
+  const [name, setName] = useState("");
 
-  const [tasks, setTasks] = useState([])
-  const [name, setName] = useState('')
-
-  // backend url 
-  const API_URL = "http://localhost:2009/tasks";
+  // backend url
+  // const API_URL = "http://localhost:2009/tasks";
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     fetch(API_URL)
-      .then(res => res.json())
-      .then(data => setTasks(data))
-      .catch(err => console.error("Failed to fetch tasks:", err));
-  }, [])
+      .then((res) => res.json())
+      .then((data) => setTasks(data))
+      .catch((err) => console.error("Failed to fetch tasks:", err));
+  }, []);
 
   async function addTask(e) {
-    e.preventDefault()
-    if (!name) return
+    e.preventDefault();
+    if (!name) return;
 
     const newTask = { title: name };
 
     try {
       const res = await fetch(API_URL, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(newTask),
-      })
+      });
 
       const savedTask = await res.json();
+      const savedTaskWithId = { ...savedTask, id: savedTask._id };
       setTasks([...tasks, savedTask]); // update UI
-      setName('');
+      setName("");
     } catch (err) {
       console.error("Failed to add task:", err);
     }
   }
 
-
   async function DeleteTask(id) {
     try {
       await fetch(`${API_URL}/${id}`, {
-        method: "DELETE"
+        method: "DELETE",
       });
-      setTasks(tasks.filter(task => task._id !== id)); // remove from UI
+      setTasks(tasks.filter((task) => task._id !== id));
     } catch (err) {
       console.error("Failed to delete task:", err);
     }
   }
 
-
   return (
     <div className="bg-gray-300 min-h-screen w-full flex flex-col justify-center items-center">
       {/* to do list goes here */}
-      <div className='rounded-2xl bg-[#ececec] flex flex-col items-center justify-center p-2  '>
+      <div className="rounded-2xl bg-[#ececec] flex flex-col items-center justify-center p-2  ">
         {/* display  */}
-        <form className='flex flex-col items-center justify-center gap-3' onSubmit={addTask} >
-          <input value={name} onChange={(e) => setName(e.target.value)} className="bg-gray-400 text-xl font-semibold text-white rounded-xl p-4 w-100 focus:outline-white focus:outline-2" type="text" name="" id="" />
-          <button type='submit' disabled={!name} className="bg-gray-400 hover:bg-gray-500 text-xl font-semibold text-white rounded-xl cursor-pointer transition-all duration-300 hover:scale-102 p-4 w-100">Add Task</button>
+        <form
+          className="flex flex-col items-center justify-center gap-3"
+          onSubmit={addTask}
+        >
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="bg-gray-400 text-xl font-semibold text-white rounded-xl p-4 w-100 focus:outline-white focus:outline-2"
+            type="text"
+            name=""
+            id=""
+          />
+          <button
+            type="submit"
+            disabled={!name}
+            className="bg-gray-400 hover:bg-gray-500 text-xl font-semibold text-white rounded-xl cursor-pointer transition-all duration-300 hover:scale-102 p-4 w-100"
+          >
+            Add Task
+          </button>
         </form>
         {/* Tasks go here*/}
         <ul className="mt-5 flex flex-col gap-1 h-60 w-full overflow-y-scroll">
@@ -68,14 +83,17 @@ export default function App() {
           ) : (
             tasks.map((task) => (
               <li
-                key={task.id}
+                key={task._id}
                 className="bg-gray-400 text-xl font-semibold text-white rounded-xl flex items-center justify-between p-4 w-100"
               >
                 {/* task name */}
                 <span>{task.title}</span>
 
                 {/* delete button */}
-                <span onClick={() => DeleteTask(task.id)} className="cursor-pointer">
+                <span
+                  onClick={() => DeleteTask(task._id)}
+                  className="cursor-pointer"
+                >
                   <svg
                     className="text-white"
                     xmlns="http://www.w3.org/2000/svg"
@@ -92,8 +110,7 @@ export default function App() {
             ))
           )}
         </ul>
-
       </div>
     </div>
-  )
+  );
 }
