@@ -8,6 +8,8 @@ export default function App() {
   // const API_URL = "http://localhost:2009/tasks";
   const API_URL = import.meta.env.VITE_API_URL;
 
+  // console.log("Backend API URL:", API_URL);
+
   useEffect(() => {
     fetch(API_URL)
       .then((res) => res.json())
@@ -52,6 +54,7 @@ export default function App() {
 
   return (
     <div className="bg-gray-300 min-h-screen w-full flex flex-col justify-center items-center">
+      <p className="text-gray-500 mt-3 text-sm">Using backend: {API_URL}</p>
       {/* to do list goes here */}
       <div className="rounded-2xl bg-[#ececec] flex flex-col items-center justify-center p-2  ">
         {/* display  */}
