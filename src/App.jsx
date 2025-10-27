@@ -3,21 +3,53 @@ import { useState, useEffect } from 'react'
 export default function App() {
 
   const [tasks, setTasks] = useState([])
-
   const [name, setName] = useState('')
 
-  function addTask(e) {
-    if (name) {
-      e.preventDefault()
-      const newTask = { id: Date.now(), name: name }
-      setTasks([...tasks, newTask])
-      setName('')
+  // backend url 
+  const API_URL = "http://localhost:2009/tasks";
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(data => setTasks(data))
+      .catch(err => console.error("Failed to fetch tasks:", err));
+  }, [])
+
+  async function addTask(e) {
+    e.preventDefault()
+    if (!name) return
+
+    const newTask = { title: name };
+
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newTask),
+      })
+
+      const savedTask = await res.json();
+      setTasks([...tasks, savedTask]); // update UI
+      setName('');
+    } catch (err) {
+      console.error("Failed to add task:", err);
     }
   }
 
-  function DeleteTask(id) {
-    setTasks(tasks.filter((task) => task.id !== id))
+
+  async function DeleteTask(id) {
+    try {
+      await fetch(`${API_URL}/${id}`, {
+        method: "DELETE"
+      });
+      setTasks(tasks.filter(task => task._id !== id)); // remove from UI
+    } catch (err) {
+      console.error("Failed to delete task:", err);
+    }
   }
+
 
   return (
     <div className="bg-gray-300 min-h-screen w-full flex flex-col justify-center items-center">
@@ -40,7 +72,7 @@ export default function App() {
                 className="bg-gray-400 text-xl font-semibold text-white rounded-xl flex items-center justify-between p-4 w-100"
               >
                 {/* task name */}
-                <span>{task.name}</span>
+                <span>{task.title}</span>
 
                 {/* delete button */}
                 <span onClick={() => DeleteTask(task.id)} className="cursor-pointer">
