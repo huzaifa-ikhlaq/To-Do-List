@@ -49,12 +49,11 @@ export default function App() {
       setTasks(tasks.filter((task) => task._id !== id));
     } catch (err) {
       console.error("Failed to delete task:", err);
-    }
+    } 
   }
 
   return (
     <div className="bg-gray-300 min-h-screen w-full flex flex-col justify-center items-center">
-      <p className="text-gray-500 mt-3 text-sm">Using backend: {API_URL}</p>
       {/* to do list goes here */}
       <div className="rounded-2xl bg-[#ececec] flex flex-col items-center justify-center p-2  ">
         {/* display  */}
@@ -79,7 +78,7 @@ export default function App() {
           </button>
         </form>
         {/* Tasks go here*/}
-        <ul className="mt-5 flex flex-col gap-1 h-60 w-full overflow-y-scroll">
+        <ul className="mt-5 flex flex-col gap-1 h-60 w-full overflow-y-scroll ">
           ({tasks.length})
           {tasks.length === 0 ? (
             <p className="text-gray-500 text-center text-lg mt-4">No tasks</p>
